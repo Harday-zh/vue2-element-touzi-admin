@@ -90,11 +90,11 @@ module.exports = {
     })
     .end()
     // 项目文件大小分析
-    config.plugin('webpack-bundle-analyzer')
-    .use(new BundleAnalyzerPlugin({
-      openAnalyzer: false,   // 是否打开默认浏览器
-      analyzerPort:8777
-    }))
+    // config.plugin('webpack-bundle-analyzer')
+    // .use(new BundleAnalyzerPlugin({
+    //   openAnalyzer: false,   // 是否打开默认浏览器
+    //   analyzerPort:8777
+    // }))
 
     // 对vue-cli内部的 webpack 配置进行更细粒度的修改。
     // 添加CDN参数到htmlWebpackPlugin配置中， 详见public/index.html 修改
@@ -127,28 +127,22 @@ module.exports = {
         'js-cookie':'Cookies'
       }
       // 去除console来减少文件大小，效果同'UglifyJsPlugin'
-      new TerserPlugin({
-        cache: true,
-        parallel: true,
-        sourceMap: true, // Must be set to true if using source-maps in production
-        terserOptions: {
-          compress: {
-            warnings: false,
-            drop_console: true,
-            drop_debugger: true,
-            pure_funcs: ['console.log']
+      config.optimization.minimizer = [
+        new TerserPlugin({
+          terserOptions: {
+            compress: {
+              warnings: false,
+              drop_console: true
+            }
           }
-        }
-      })
+        })
+      ]
       // 开启gzip压缩
       config.plugins.push(new CompressionPlugin({
         algorithm: 'gzip',
-        test: new RegExp("\\.(" + ["js", "css"].join("|") + ")$"), // 匹配文件扩展名
-        // threshold: 10240, // 对超过10k的数据进行压缩
-        threshold: 5120, // 对超过5k的数据进行压缩
-        minRatio: 0.8,
-        cache: true, // 是否需要缓存
-        deleteOriginalAssets:false  // true删除源文件(不建议);false不删除源文件
+        test: /\.(js|css)$/,
+        threshold: 5120,
+        minRatio: 0.8
       }))
 
     } else {
